@@ -56,6 +56,7 @@ void loop() {
         String pm25 = String((buf[3] * 256 + buf[2]) / 10);
         String pm10 = String((buf[5] * 256 + buf[4]) / 10);
         post(pm25, pm10);
+        delay(1000);
       }
     }
   } else {
