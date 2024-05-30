@@ -1,7 +1,5 @@
-int ESP_ID = 0;
-
 // WIFI access point
-String AP_NAME = "Nanomachines";
+String AP_NAME = "AirQuality_id0_esp";
 String AP_PASSWORD = "12345678";
 
 // CLI WIFI client
@@ -17,7 +15,7 @@ String states[] = {
   "SENDING_DATA"
 };
 
-String ip = "";
+String IP_SERVER = "192.168.247.201";
 String state = states[0];
 
 bool APconnect = false;

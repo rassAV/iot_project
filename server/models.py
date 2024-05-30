@@ -8,5 +8,4 @@ class Data(Base):
     pm25 = Column(Integer)
     pm10 = Column(Integer)
     esp_name = Column(String)
-    esp_id = Column(Integer)
     timestamp = Column(DATETIME)

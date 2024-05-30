@@ -23,9 +23,9 @@ def get_db():
 def greet():
     return {"Message": "Hello!!!"}
 
-@app.get("/air/{esp_id}")
-def get_air(esp_id: int, db: Session = Depends(get_db)):
-    db_data = crud.get_data(db, esp_id=esp_id)
+@app.get("/air/{esp_name}")
+def get_air(esp_name: str, db: Session = Depends(get_db)):
+    db_data = crud.get_data(db, esp_name=esp_name)
     if db_data is None:
         raise HTTPException(status_code=404, detail="data not found")
     return {"values": db_data}

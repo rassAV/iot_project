@@ -5,6 +5,8 @@
 ESP8266WiFiMulti wifiMulti;
 WiFiClient wifiClient;
 
+String ip = "";
+
 String id() {
   int mac_len = WL_MAC_ADDR_LENGTH;
   uint8_t mac[mac_len];
