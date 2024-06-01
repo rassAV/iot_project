@@ -43,7 +43,7 @@ void setup() {
 void loop() {
   if (state == states[1]) {
     redLightFlashing(millis() - ledFlashingStart);
-    if (millis() - delayStart > 50) {
+    if (millis() - delayStart > 20) {
       is_wifi_on = init_WIFI(false);
       if (is_wifi_on) {
         state = states[2];
@@ -68,7 +68,7 @@ void loop() {
     }
   } else {
     redLight();
-    if (millis() - delayStart > 50) {
+    if (millis() - delayStart > 20) {
       if (!APconnect) {
         is_wifi_on = init_WIFI(true);
         if (is_wifi_on) {
