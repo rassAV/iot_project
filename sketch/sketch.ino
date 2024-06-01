@@ -48,7 +48,7 @@ void loop() {
       if (is_wifi_on) {
         state = states[2];
       }
-      delayStart = millis()
+      delayStart = millis();
     }
   } else if (state == states[2]) {
     yellowLight();
@@ -62,7 +62,7 @@ void loop() {
           String pm25 = String((buf[3] * 256 + buf[2]) / 10);
           String pm10 = String((buf[5] * 256 + buf[4]) / 10);
           post(pm25, pm10);
-          dataSendingStart = millis()
+          dataSendingStart = millis();
         }
       }
     }
@@ -78,7 +78,7 @@ void loop() {
       } else {
         server.handleClient();
       }
-      delayStart = millis()
+      delayStart = millis();
     }
   }
   
@@ -102,7 +102,7 @@ void loop() {
 
 
 
-void post(String pm25, String p10) {
+void post(String pm25, String pm10) {
   WiFiClient client;
   HTTPClient http;
 
