@@ -16,12 +16,12 @@ String id() {
 }
 
 bool start_AP_mode() {
-  String ssid_id = AP_NAME;
+  String ssid_id = ESP_NAME;
   IPAddress ap_IP(192, 168, 99, 34);
   WiFi.disconnect();
   WiFi.mode(WIFI_AP);
   WiFi.softAPConfig(ap_IP, ap_IP, IPAddress(255, 255, 255, 0));
-  WiFi.softAP((AP_NAME + id()).c_str(), AP_PASSWORD.c_str());
+  WiFi.softAP((ESP_NAME + "_esp" + id()).c_str(), ESP_PASSWORD.c_str());
   Serial.println("\nWiFi started in AP mode " + ssid_id);
   return true;
 }

@@ -1,8 +1,6 @@
-int ESP_ID = 0;
-
 // WIFI access point
-String AP_NAME = "AirQuality_id0_esp";
-String AP_PASSWORD = "12345678";
+String ESP_NAME = "AirQuality_id0";
+String ESP_PASSWORD = "12345678";
 
 // CLI WIFI client
 const char* CLI_SSID = "";
