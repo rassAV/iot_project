@@ -1,3 +1,5 @@
+int ESP_ID = 0;
+
 // WIFI access point
 String AP_NAME = "AirQuality_id0_esp";
 String AP_PASSWORD = "12345678";
