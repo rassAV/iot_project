@@ -8,12 +8,12 @@
 #include "wifi.h"
 #include "server.h"
 
-#define rx_pin 3
-#define tx_pin 4
-#define button_pin 5
-#define red_rgb_led 8
-#define green_rgb_led 7
-#define blue_rgb_led 6
+int rx_pin = D3;
+int tx_pin = D4;
+int button_pin = D5;
+int red_rgb_led = D8;
+int green_rgb_led = D7;
+int blue_rgb_led = D6;
 
 SoftwareSerial sds(rx_pin, tx_pin);
 
@@ -27,8 +27,8 @@ bool is_wifi_on = false;
 
 
 void setup() {
-  Serial.begin(9600);
-  sds.begin(9600);
+  Serial.begin(115200);
+  sds.begin(115200);
   
   pinMode(button_pin, INPUT_PULLUP);
   pinMode(red_rgb_led, OUTPUT);

@@ -15,7 +15,7 @@ String states[] = {
   "SENDING_DATA"
 };
 
-String IP_SERVER = "192.168.247.201";
+String IP_SERVER = "192.168.0.59";
 String state = states[0];
 
 bool APconnect = false;
