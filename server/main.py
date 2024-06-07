@@ -34,6 +34,9 @@ def hash_password(password: str) -> str:
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     return hash_password(plain_password) == hashed_password
 
+def verify_password_ho_hashed(plain_password: str, old_password: str) -> bool:
+    return plain_password == old_password
+
 @app.get("/")
 def greet(request: Request):
     auth_token = request.cookies.get("auth_token")
@@ -41,7 +44,7 @@ def greet(request: Request):
         return RedirectResponse(url="/sensor")
     return templates.TemplateResponse("index.html", {"request": request, "message": "Hello!!!"})
 
-@app.post("/register")
+@app.post("/change_password")
 def register(
     request: Request,
     esp_name: str = Form(...),
@@ -57,7 +60,7 @@ def register(
     name = db.query(models.Data).filter(models.Data.esp_name == esp_name).first()
     if name == None:
         return templates.TemplateResponse("index.html", {"request": request, "message": "ESP name isn't in data."})
-    new_client = models.Clients(esp_name=esp_name, password=hash_password(password))
+    new_client = models.Clients(esp_name=esp_name, password=password)
     db.add(new_client)
     db.commit()
     return templates.TemplateResponse("index.html", {"request": request, "message": "Registration successful. Please log in."})
@@ -70,7 +73,7 @@ def login(
     db: Session = Depends(get_db)
 ):
     client = db.query(models.Clients).filter(models.Clients.esp_name == esp_name).first()
-    if not client or not verify_password(password, client.password):
+    if not client or not verify_password_ho_hashed(password, client.password):
         return templates.TemplateResponse("index.html", {"request": request, "message": "Invalid ESP name or password."})
     response = RedirectResponse(url="/sensor")
     response.set_cookie(key="auth_token", value=uuid.uuid4().hex, httponly=True, max_age=60*60*24)
@@ -78,6 +81,9 @@ def login(
 
 @app.get("/sensor")
 def sensor_page(request: Request):
+    auth_token = request.cookies.get("auth_token")
+    if auth_token == None:
+        return RedirectResponse(url="/")
     return templates.TemplateResponse("sensor.html", {"request": request})
 
 @app.post("/sensor")
