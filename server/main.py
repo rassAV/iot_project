@@ -1,9 +1,12 @@
-from fastapi import Depends, FastAPI, HTTPException, Request
+from fastapi import Depends, FastAPI, HTTPException, Request, Form
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
+from fastapi.responses import RedirectResponse
 from sqlalchemy.orm import Session
 from database import SessionLocal, engine
-import datetime
+from datetime import timedelta
+import hashlib
+import uuid
 import schemas
 import models
 import crud
@@ -23,9 +26,63 @@ def get_db():
     finally:
         db.close()
 
+ACCESS_TOKEN_EXPIRE_MINUTES = 1440  # 24 hours
+
+def hash_password(password: str) -> str:
+    return hashlib.sha256(password.encode()).hexdigest()
+
+def verify_password(plain_password: str, hashed_password: str) -> bool:
+    return hash_password(plain_password) == hashed_password
+
 @app.get("/")
 def greet(request: Request):
+    auth_token = request.cookies.get("auth_token")
+    if auth_token:
+        return RedirectResponse(url="/sensor")
     return templates.TemplateResponse("index.html", {"request": request, "message": "Hello!!!"})
+
+@app.post("/register")
+def register(
+    request: Request,
+    esp_name: str = Form(...),
+    password: str = Form(...),
+    confirm_password: str = Form(...),
+    db: Session = Depends(get_db)
+):
+    if password != confirm_password:
+        return templates.TemplateResponse("index.html", {"request": request, "message": "Passwords do not match."})
+    client = db.query(models.Clients).filter(models.Clients.esp_name == esp_name).first()
+    if client:
+        return templates.TemplateResponse("index.html", {"request": request, "message": "ESP name already registered."})
+    name = db.query(models.Data).filter(models.Data.esp_name == esp_name).first()
+    if name == None:
+        return templates.TemplateResponse("index.html", {"request": request, "message": "ESP name isn't in data."})
+    new_client = models.Clients(esp_name=esp_name, password=hash_password(password))
+    db.add(new_client)
+    db.commit()
+    return templates.TemplateResponse("index.html", {"request": request, "message": "Registration successful. Please log in."})
+
+@app.post("/login")
+def login(
+    request: Request,
+    esp_name: str = Form(...),
+    password: str = Form(...),
+    db: Session = Depends(get_db)
+):
+    client = db.query(models.Clients).filter(models.Clients.esp_name == esp_name).first()
+    if not client or not verify_password(password, client.password):
+        return templates.TemplateResponse("index.html", {"request": request, "message": "Invalid ESP name or password."})
+    response = RedirectResponse(url="/sensor")
+    response.set_cookie(key="auth_token", value=uuid.uuid4().hex, httponly=True, max_age=60*60*24)
+    return response
+
+@app.get("/sensor")
+def sensor_page(request: Request):
+    return templates.TemplateResponse("sensor.html", {"request": request})
+
+@app.post("/sensor")
+def sensor_page(request: Request):
+    return templates.TemplateResponse("sensor.html", {"request": request})
 
 @app.get("/pm25/{esp_name}")
 def get_all_pm25(esp_name: str, db: Session = Depends(get_db)):
