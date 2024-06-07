@@ -2,10 +2,27 @@
 <html>
 <head>
     <title>Sensor Page</title>
-    <link rel="stylesheet" href="/static/css/styles.css">
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 </head>
 <body>
-    <h1>Welcome to the Sensor Page</h1>
-    <p>This is a placeholder for future sensor data display.</p>
+    <h1>Sensor Data</h1>
+    <div id="graph">{{ graph|safe }}</div>
+    <h2>Last 5 Data Entries</h2>
+    <table>
+        <tr>
+            <th>Timestamp</th>
+            <th>PM2.5</th>
+            <th>PM10</th>
+            <th>ESP Name</th>
+        </tr>
+        {% for data in last_5_data %}
+        <tr>
+            <td>{{ data.timestamp }}</td>
+            <td>{{ data.pm25 }}</td>
+            <td>{{ data.pm10 }}</td>
+            <td>{{ data.esp_name }}</td>
+        </tr>
+        {% endfor %}
+    </table>
 </body>
 </html>
