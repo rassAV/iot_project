@@ -6,6 +6,8 @@
 </head>
 <body>
     <h1>Sensor Data</h1>
+    <p>Среднее значение PM2.5 за все время: {{ mean_pm25 }}</p>
+    <p>Среднее значение PM10 за все время: {{ mean_pm10 }}</p>
     <div id="graph">{{ graph|safe }}</div>
     <h2>Last 5 Data Entries</h2>
     <table>
@@ -24,5 +26,11 @@
         </tr>
         {% endfor %}
     </table>
+    <p>Аномальные значения:</p>
+    <ul>
+        {% for data in anomalies %}
+            <li>Дата: {{ data.timestamp }}, PM2.5: {{ data.pm25 }}, PM10: {{ data.pm10 }}</li>
+        {% endfor %}
+    </ul>
 </body>
 </html>

@@ -11,6 +11,7 @@ import schemas
 import models
 import crud
 import plotly.graph_objects as go
+from statistics import mean, stdev
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -116,6 +117,19 @@ def sensor_page(request: Request, db: Session = Depends(get_db)):
         return RedirectResponse(url="/")
     
     esp_name = client.esp_name
+
+    all_time_data = crud.get_data_for_period(db, esp_name)
+    
+    pm25_values = [data.pm25 for data in all_time_data]
+    pm10_values = [data.pm10 for data in all_time_data]
+    mean_pm25 = mean(pm25_values)
+    mean_pm10 = mean(pm10_values)
+    
+    anomalies = []
+    for data in all_time_data:
+        if data.pm25 - mean_pm25 > 3 * stdev(pm25_values) or data.pm10 - mean_pm10 > 3 * stdev(pm10_values):
+            anomalies.append(data)
+    anomalies = anomalies[-5:]
     
     time_intervals = {
         "All Time": (datetime.now() - timedelta(days=365*10), datetime.now()),  # 10 years
@@ -126,21 +140,17 @@ def sensor_page(request: Request, db: Session = Depends(get_db)):
     selected_interval = request.query_params.get("interval", "All Time")
     start_date, end_date = time_intervals[selected_interval]
     
-    # Получаем данные за выбранный интервал времени
     interval_data = crud.get_data_for_period(db, esp_name, start_date, end_date)
     interval_dates = [data.timestamp for data in interval_data]
     interval_pm25 = [data.pm25 for data in interval_data]
     interval_pm10 = [data.pm10 for data in interval_data]
     
-    # Получаем последние 5 строк данных в реальном времени
     last_5_data = crud.get_last_n_data(db, esp_name, n=5)
     
-    # Создаем график
     fig = go.Figure()
     fig.add_trace(go.Scatter(x=interval_dates, y=interval_pm25, mode='lines', name='PM2.5', line=dict(color="black")))
     fig.add_trace(go.Scatter(x=interval_dates, y=interval_pm10, mode='lines', name='PM10', line=dict(color="gray")))
     
-    # Добавляем горизонтальные линии на уровни значений датчика PM2.5
     fig.add_shape(
         dict(type="line", x0=min(interval_dates), y0=25, x1=max(interval_dates), y1=25, line=dict(color="yellow", width=5))
     )
@@ -148,22 +158,10 @@ def sensor_page(request: Request, db: Session = Depends(get_db)):
         dict(type="line", x0=min(interval_dates), y0=50, x1=max(interval_dates), y1=50, line=dict(color="red", width=5))
     )
     
-    # Добавляем макет графика
     fig.update_layout(title='Sensor Data', xaxis_title='Date', yaxis_title='Value')
-    
-    # Преобразуем график в HTML и передаем его в шаблон
     graph_html = fig.to_html(full_html=False, default_height=500, default_width=700)
     
-    return templates.TemplateResponse(
-        "sensor.html", 
-        {
-            "request": request, 
-            "graph": graph_html, 
-            "last_5_data": last_5_data,
-            "time_intervals": time_intervals,
-            "selected_interval": selected_interval
-        }
-    )
+    return templates.TemplateResponse("sensor.html", {"request": request, "graph": graph_html, "last_5_data": last_5_data, "mean_pm25": mean_pm25, "mean_pm10": mean_pm10, "anomalies": anomalies})
 
 @app.post("/sensor")
 async def sensor_page(request: Request, interval: str = Form(...), db: Session = Depends(get_db)):
