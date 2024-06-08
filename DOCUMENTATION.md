@@ -43,9 +43,13 @@ API запросы:
 GET("/") - основная страница сервера
 
 GET("/pm25/{esp_name}") - массив всех измерений pm2.5 по имени esp
+    
     esp_name: str
+    
 GET("/pm10/{esp_name}") - массив всех измерений pm10 по имени esp
+
     esp_name: str
+    
 GET("/esp_names", response_model=list[str]) - массив всех имён esp
 GET("/sensor") - 
 POST("/sensor") - 
