@@ -166,3 +166,38 @@ def sensor_page(request: Request, db: Session = Depends(get_db)):
 @app.post("/sensor")
 async def sensor_page(request: Request, interval: str = Form(...), db: Session = Depends(get_db)):
     return RedirectResponse(url=f"/sensor?interval={interval}")
+
+@app.post("/clients/")
+def create_client(request: Request, db: Session = Depends(get_db)):
+    new_client = models.Clients(esp_name=models.client.esp_name, password=models.client.password)
+    db.add(new_client)
+    db.commit()
+    db.refresh(new_client)
+    
+    return new_client
+
+@app.delete("/data/")
+def delete_data(request: Request, db: Session = Depends(get_db)):
+    data_to_delete = db.query(models.Data).filter(
+        and_(
+            models.Data.esp_name == request.esp_name,
+            models.Data.timestamp >= request.start_date,
+            models.Data.timestamp <= request.end_date
+        )
+    ).all()
+
+    if not data_to_delete:
+        raise HTTPException(status_code=404, detail="No data found for the given criteria")
+
+    # Delete the data
+    db.query(models.Data).filter(
+        and_(
+            models.Data.esp_name == request.esp_name,
+            models.Data.timestamp >= request.start_date,
+            models.Data.timestamp <= request.end_date
+        )
+    ).delete(synchronize_session=False)
+
+    db.commit()
+
+    return {"message": "Data deleted successfully"}
