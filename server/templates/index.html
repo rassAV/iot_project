@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+    <h1>{{ message }}</h1>
+    <div class="item">
+        <!-- <div>
+            <h2 style="text-align: center;">Register</h2>
+            <form method="post" action="/register">
+                <label for="reg_esp_name">ESP Name:</label>
+                <input type="text" id="reg_esp_name" name="esp_name" required>
+                <label for="reg_password">Password:</label>
+                <input type="password" id="reg_password" name="password" required>
+                <label for="reg_confirm_password">Confirm Password:</label>
+                <input type="password" id="reg_confirm_password" name="confirm_password" required>
+                <button type="submit">Register</button>
+            </form>
+        </div> -->
+        <div>
+            <h2 style="text-align: center;">Login</h2>
+            <form method="post" action="/login">
+                <label for="login_esp_name">ESP Name:</label>
+                <input type="text" id="login_esp_name" name="esp_name" required>
+                <label for="login_password">Password:</label>
+                <input type="password" id="login_password" name="password" required>
+                <button type="submit">Login</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

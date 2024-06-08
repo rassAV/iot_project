@@ -13,4 +13,8 @@ class AirValueWithTimestamp(BaseModel):
     esp_name: str
     timestamp: datetime
 
+class ClientsValue(BaseModel):
+    esp_name: str
+    password: str
+
 router = APIRouter()
