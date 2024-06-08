@@ -51,33 +51,57 @@ GET("/pm10/{esp_name}") - массив всех измерений pm10 по и�
     esp_name: str
     
 GET("/esp_names", response_model=list[str]) - массив всех имён esp
+
 GET("/sensor") - 
+
 POST("/sensor") - 
+
     interval: str = Form(...)
+    
 POST("/submit_air") - отправка данных на сервер
+
     pm25: int,
+    
     pm10: int,
+    
     esp_name: str
+    
 POST("/login") - авторизация пользователя
+
     esp_name: str = Form(...),
+    
     password: str = Form(...)
+    
 POST("/change_password") - устаревший, неверный запрос
+
     esp_name: str = Form(...),
+    
     password: str = Form(...),
+    
     confirm_password: str = Form(...)
 
 База данных (содержит две таблицы):
 
 Data - таблица для хранения данных с датчиков
+
     id = Column(Integer, primary_key=True, index=True)
+    
     pm25 = Column(Integer, nullable=False)
+    
     pm10 = Column(Integer, nullable=False)
+    
     esp_name = Column(String, nullable=False)
+    
     timestamp = Column(DateTime, nullable=False)
+    
 Clients - таблица для хранения имён и паролей esp (они же аккаунты пользователей)
+
     id = Column(Integer, primary_key=True, index=True)
+    
     esp_name = Column(String, unique=True, nullable=False)
+    
     password = Column(String, nullable=False)
+    
 
 Сайт (содержит две страницы):
 
